@@ -81,8 +81,12 @@ def dfs(i, j):
                                 
             UP, DOWN, LEFT, RIGHT, UP-RIGHT, UP-LEFT, DOWN-RIGHT, DOWN-LEFT
     """
-    for row, column in [(-1, 0), (1, 0), (0, 1), (0, -1), (1, 1), (-1, -1), (-1, 1), (1, -1)]:
-        dfs(i+row, j+column)
+    r = [-1, 0, 1]
+    c = [1, 0, -1]
+    for dr in r:
+        for dc in c:
+            if dr == 0 and dc == 0: continue
+            dfs(i+dr, j+dc)
 
 def connectedCompenets():
     global pixel
