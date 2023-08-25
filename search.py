@@ -9,12 +9,8 @@ def dfs(i, j):
     if visited[i][j] or not _2Darray[i][j]: return 0
     visited[i][j] = 1
     pixel += 1
-    r = [-1, 0, 1]
-    c = [1, 0, -1]
-    for dr  in r:
-        for dc in c:
-            if dr == 0 and dc == 0: continue
-            dfs(i+dr, j+dc)
+    for row, column in [(-1, 0), (1, 0), (0, 1), (0, -1), (1,1), (-1, -1), (-1, 1), (1, -1)]:
+        dfs(i+row, j+column)
 
 
 nuclei = 0
