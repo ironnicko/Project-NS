@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "vite:start": "vite",
-    "vite:build": "vite build"
+    "vite:build": "vite build",
+    "start" : "vite build"
   },
   "dependencies": {
     "bootstrap": "^5.2.2",
