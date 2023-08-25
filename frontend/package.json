@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "vite:start": "vite",
     "vite:build": "vite build",
-    "start" : "vite build"
+    "start" : "vite"
   },
   "dependencies": {
     "bootstrap": "^5.2.2",
