@@ -21,7 +21,7 @@ export default function LandingPage() {
           <img src="" />
           <img
             className="title-image m-0"
-            src="src\assets\images\floatimage.svg"
+            src="/images/floatimage.svg"
           ></img>
         </div>
       </div>

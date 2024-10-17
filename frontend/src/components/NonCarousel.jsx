@@ -11,11 +11,23 @@ import {
   QuerySnapshot,
   orderBy,
 } from "firebase/firestore";
-import firebaseConfig from "./serviceAccountKey.json";
+// import firebaseConfig from "./serviceAccountKey.json";
 import TimePicker from "react-time-picker";
 
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_apiKey,
+  authDomain: import.meta.env.VITE_authDomain,
+  projectId: import.meta.env.VITE_projectId,
+  storageBucket: import.meta.env.VITE_storageBucket,
+  messagingSenderId: import.meta.env.VITE_messagingSenderId,
+  appId: import.meta.env.VITE_appId,
+};
+
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+console.log(import.meta.env);
 
 const epochTimeConverted = (time, hm) => {
   const date = new Date(time + " " + hm);
