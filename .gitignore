@@ -165,4 +165,5 @@ env/
 .DS_Store
 test.png
 backend/stage1_train
-model_training
+/model_training
+serviceAccountKey.json
