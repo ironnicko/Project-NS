@@ -11,6 +11,8 @@ from process import postProcess
 import firebase_admin
 from time import time
 from firebase_admin import credentials, firestore
+from base64 import b64encode
+
 
 class CameraThread(QThread):
     image_signal = pyqtSignal(np.ndarray)
@@ -41,10 +43,8 @@ class ProcessImagesThread(QThread):
 
     def run(self):
         for index, frame in enumerate(self.captured_images):
-            # Resize before converting to BGR
             frame_resized = resize(
                 frame, (256, 256), mode='constant', preserve_range=True)
-            # Convert to BGR for post-processing
             image = cv2.cvtColor(frame_resized.astype(
                 np.uint8), cv2.COLOR_RGB2BGR)
 
@@ -185,6 +185,43 @@ class MainApp(QMainWindow):
         self.process_images_thread.result_signal.connect(self.display_results)
         self.process_images_thread.start()
 
+    def QImageToCvMat(self, incomingImage, target_size=(128, 128)):
+        if incomingImage.isNull():
+            return np.array([])
+
+        width = incomingImage.width()
+        height = incomingImage.height()
+        fmt = incomingImage.format()
+
+        if fmt == QImage.Format_RGB32:
+            ptr = incomingImage.bits()
+            ptr.setsize(incomingImage.byteCount())
+            arr = np.frombuffer(ptr, dtype=np.uint8).reshape(
+                (height, width, 4))
+            cv_mat = cv2.cvtColor(arr, cv2.COLOR_RGBA2BGR)
+
+        elif fmt == QImage.Format_RGB888:
+            ptr = incomingImage.bits()
+            ptr.setsize(incomingImage.byteCount())
+            arr = np.frombuffer(ptr, dtype=np.uint8).reshape(
+                (height, width, 3))
+            cv_mat = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
+
+        elif fmt == QImage.Format_Grayscale8:
+            ptr = incomingImage.bits()
+            ptr.setsize(incomingImage.byteCount())
+            cv_mat = np.frombuffer(
+                ptr, dtype=np.uint8).reshape((height, width))
+
+        else:
+            incomingImage = incomingImage.convertToFormat(QImage.Format_RGB888)
+            return QImageToCvMat(incomingImage, target_size)
+
+        resized_cv_mat = cv2.resize(
+            cv_mat, target_size, interpolation=cv2.INTER_AREA)
+
+        return resized_cv_mat
+
     def display_results(self, image_qt, nuclei_count, adj_nuclei_count):
         result_label = QLabel()
         result_label.setPixmap(QPixmap.fromImage(
@@ -199,12 +236,12 @@ class MainApp(QMainWindow):
         self.scroll_area.verticalScrollBar().setValue(
             self.scroll_area.verticalScrollBar().maximum())
         frame = image_qt
-        _, jpeg = cv2.imencode('.png', frame)
+        _, jpeg = cv2.imencode('.png', self.QImageToCvMat(frame))
 
         im_b64 = b64encode(jpeg.tobytes()).decode()
 
         self.db.collection('Images').add({
-            'original_image' : b64encode(og_jpeg.tobytes()).decode(),
+            # 'original_image': b64encode(og_jpeg.tobytes()).decode(),
             'segmented_image': im_b64,
             'nuclei_count': nuclei_count,
             'adjusted_nuclei_count': adj_nuclei_count,
